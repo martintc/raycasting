@@ -10,7 +10,7 @@ const FOV_ANGLE = 60 * (Math.PI / 180);
 const WALL_STRIP_WIDTH = 1; 
 const NUM_RAYS = WINDOW_WIDTH / WALL_STRIP_WIDTH;
 
-const MINIMAP_SCALE_FACTOR = 0.2;
+const MINIMAP_SCALE_FACTOR = 0.25;
 
 class Map {
     constructor() {
@@ -63,8 +63,8 @@ class Player {
         this.turnDirection = 0; // -1 if left, +1 if right
         this.walkDirection = 0; // -1 if back, +1 if front
         this.rotationAngle = Math.PI / 2;
-        this.moveSpeed = 4.0;
-        this.rotationSpeed = 3 * (Math.PI / 180);
+        this.moveSpeed = 2.0;
+        this.rotationSpeed = 2 * (Math.PI / 180);
     }
     update() {
         this.rotationAngle += this.turnDirection * this.rotationSpeed;
@@ -111,7 +111,7 @@ class Ray {
         this.isRayFacingRight = this.rayAngle < 0.5 * Math.PI || this.rayAngle > 1.5 * Math.PI;
         this.isRayFacingLeft = !this.isRayFacingRight;
     }
-    cast(columnId) {
+    cast() {
         var xintercept, yintercept;
         var xstep, ystep;
 
@@ -200,10 +200,17 @@ class Ray {
             : Number.MAX_VALUE;
 
         // only store the smallest of the distances
-        this.wallHitX = (horzHitDistance < vertHitDistance) ? horzWallHitX : vertWallHitX;
-        this.wallHitY = (horzHitDistance < vertHitDistance) ? horzWallHitY : vertWallHitY;
-        this.distance = (horzHitDistance < vertHitDistance) ? horzHitDistance : vertHitDistance;
-        this.wasHitVertical = (vertHitDistance < horzHitDistance);
+        if (vertHitDistance < horzHitDistance) {
+            this.wallHitX = vertWallHitX;
+            this.wallHitY = vertWallHitY;
+            this.distance = vertHitDistance;
+            this.wasHitVertical = true;
+        } else {
+            this.wallHitX = horzWallHitX;
+            this.wallHitY = horzWallHitY;
+            this.distance = horzHitDistance;
+            this.wasHitVertical = false;
+        }
     }
     render() {
         stroke("rgba(255, 0, 0, 1.0)");
@@ -253,8 +260,6 @@ function keyReleased() {
 }
 
 function castAllRays() {
-    var columnId = 0;
-
     // start first ray subtracting half of the FOV
     var rayAngle = player.rotationAngle - (FOV_ANGLE / 2);
 
@@ -263,12 +268,10 @@ function castAllRays() {
     // loop all columns casting the rays
     for (var i = 0; i < NUM_RAYS; i++) {
         var ray = new Ray(rayAngle);
-        ray.cast(columnId);
+        ray.cast();
         rays.push(ray);
 
         rayAngle += FOV_ANGLE / NUM_RAYS;
-
-        columnId++;
     }
 }
 
@@ -277,15 +280,20 @@ function render3DProjectedWalls() {
     for (var i = 0; i < NUM_RAYS; i++) {
         var ray = rays[i];
 
-        var rayDistance = ray.distance;
+        var correctWallDistance = ray.distance * Math.cos(ray.rayAngle - player.rotationAngle);
 
         // calculate the distance to the projection plane
         var distanceProjectionPlane = (WINDOW_WIDTH / 2) / Math.tan(FOV_ANGLE / 2);
 
         // projected wall height
-        var wallStripHeight = (TILE_SIZE / rayDistance) * distanceProjectionPlane;
+        var wallStripHeight = (TILE_SIZE / correctWallDistance) * distanceProjectionPlane;
         
-        fill("rgba(255, 255, 255, 1.0)");
+        //var alpha = 170 / correctWallDistance;
+        var alpha = 1.0;
+
+        var color = ray.wasHitVertical ? 255 : 180;
+
+        fill("rgba(" + color + "," + color + "," + color + "," + alpha +")");
         noStroke();
         rect(
            i * WALL_STRIP_WIDTH,
