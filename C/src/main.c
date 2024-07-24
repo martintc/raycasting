@@ -83,6 +83,16 @@ void destroyWindow() {
 	SDL_Quit();
 }
 
+int mapHasWallAt(float x, float y) {
+	if (x  < 0 || x > WINDOW_WIDTH || y < 0 || y > WINDOW_HEIGHT) {
+		return TRUE;
+	}
+
+	int mapGridIndexX = floor(x / TILE_SIZE);
+	int mapGridIndexY = floor(y / TILE_SIZE);
+	return map[mapGridIndexY][mapGridIndexX] != 0;
+}
+
 void movePlayer(float deltaTime) {
 	player.rotationAngle += player.turnDirection * player.turnSpeed * deltaTime;
 
@@ -91,10 +101,10 @@ void movePlayer(float deltaTime) {
 	float newPlayerX = player.x + cos(player.rotationAngle) * moveStep;
 	float newPlayerY = player.y + sin(player.rotationAngle) * moveStep;
 
-	player.x = newPlayerX;
-	player.y = newPlayerY;
-
-	// collision
+	if (!mapHasWallAt(newPlayerX, newPlayerY)) {
+		player.x = newPlayerX;
+		player.y = newPlayerY;
+	}
 }
 
 void setup() {
@@ -105,7 +115,7 @@ void setup() {
 	player.turnDirection = 0;
 	player.walkDirection = 0;
 	player.rotationAngle = PI / 2;
-	player.walkSpeed = 50;
+	player.walkSpeed = 100;
 	player.turnSpeed = 45 * (PI / 180);
 }
 
@@ -149,58 +159,55 @@ void renderMap() {
 
 void processInput() {
 	SDL_Event event;
-	SDL_PollEvent(&event);
-	switch(event.type) {
-		case SDL_QUIT: {
-			isGameRunning = FALSE;
-			break;
-		}
-		case SDL_KEYDOWN: {
-			if (event.key.keysym.sym == SDLK_ESCAPE) {
+	while (SDL_PollEvent(&event)) {
+		switch(event.type) {
+			case SDL_QUIT: {
 				isGameRunning = FALSE;
+				break;
 			}
+			case SDL_KEYDOWN: {
+				if (event.key.keysym.sym == SDLK_ESCAPE) {
+					isGameRunning = FALSE;
+				}
 
-			if (event.key.keysym.sym == SDLK_UP) {
-				player.walkDirection = +1;
+				if (event.key.keysym.sym == SDLK_UP) {
+					player.walkDirection = +1;
+				}
+
+				if (event.key.keysym.sym == SDLK_DOWN) {
+					player.walkDirection = -1;
+				}
+
+				if (event.key.keysym.sym == SDLK_RIGHT) {
+					player.turnDirection = +1;
+				}
+
+				if (event.key.keysym.sym == SDLK_LEFT) {
+					player.turnDirection = -1;
+				}
+
+				break;
 			}
+			case SDL_KEYUP: {
+				if (event.key.keysym.sym == SDLK_UP) {
+					player.walkDirection = 0;
+				}
 
-			if (event.key.keysym.sym == SDLK_DOWN) {
-				player.walkDirection = -1;
-			}
+				if (event.key.keysym.sym == SDLK_DOWN) {
+					player.walkDirection = 0;
+				}
 
-			if (event.key.keysym.sym == SDLK_RIGHT) {
-				player.turnDirection = +1;
-			}
+				if (event.key.keysym.sym == SDLK_RIGHT) {
+					player.turnDirection = 0;
+				}
 
-			if (event.key.keysym.sym == SDLK_LEFT) {
-				player.turnDirection = -1;
-			}
+				if (event.key.keysym.sym == SDLK_LEFT) {
+					player.turnDirection = 0;
+				}
 
-			break;
+				break;
+			} 
 		}
-		case SDL_KEYUP: {
-			if (event.key.keysym.sym == SDLK_ESCAPE) {
-				isGameRunning = FALSE;
-			}
-
-			if (event.key.keysym.sym == SDLK_UP) {
-				player.walkDirection = 0;
-			}
-
-			if (event.key.keysym.sym == SDLK_DOWN) {
-				player.walkDirection = 0;
-			}
-
-			if (event.key.keysym.sym == SDLK_RIGHT) {
-				player.turnDirection = 0;
-			}
-
-			if (event.key.keysym.sym == SDLK_LEFT) {
-				player.turnDirection = 0;
-			}
-
-			break;
-		} 
 	}
 }
 
