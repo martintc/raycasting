@@ -13,7 +13,7 @@
 #define WINDOW_WIDTH (MAP_NUM_COLS * TILE_SIZE)
 #define WINDOW_HEIGHT (MAP_NUM_ROWS * TILE_SIZE)
 
-#define FOV_ANGLE (60 * (PI / 2))
+#define FOV_ANGLE (60 * (PI / 180))
 
 #define NUM_RAYS WINDOW_WIDTH
 

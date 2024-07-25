@@ -1,8 +1,9 @@
 CC=clang
 LIBS=-lSDL2 -lm
+CFLAGS=-Wall -pedantic
 
 build:
-	$(CC) -std=c99 ./src/*.c $(LIBS) -o raycast
+	$(CC) $(CFLAGS) -std=c99 ./src/*.c $(LIBS) -o raycast
 
 run:
 	./raycast
