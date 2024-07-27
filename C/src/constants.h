@@ -1,3 +1,6 @@
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
 #define FALSE 0
 #define TRUE 1
 
@@ -23,4 +26,6 @@
 #define TEX_WIDTH 64
 #define TEX_HEIGHT 64
 
-#define NUM_TEXTURES 8
+#define NUM_TEXTURES 9
+
+#endif
