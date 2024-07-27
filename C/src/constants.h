@@ -23,3 +23,4 @@
 #define TEX_WIDTH 64
 #define TEX_HEIGHT 64
 
+#define NUM_TEXTURES 8
