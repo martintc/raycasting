@@ -2,26 +2,35 @@
 
 ray_t rays[NUM_RAYS];
 
-float normalizeAngle(float angle) {
-  angle = remainder(angle, TWO_PI);
-  if (angle < 0) {
-    angle = TWO_PI + angle;
+void normalizeAngle(float* angle) {
+  *angle = remainder(*angle, TWO_PI);
+  if (*angle < 0) {
+    *angle = TWO_PI + *angle;
   }
-
-  return angle;
 }
 
 float distanceBetweenPoints(float x1, float y1, float x2, float y2) {
   return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
-void castRay(float rayAngle, int stripId) {
-  rayAngle = normalizeAngle(rayAngle);
+bool isRayFacingDown(float angle) {
+  return angle > 0 && angle < PI;
+}
 
-  int isRayFacingDown = rayAngle > 0 && rayAngle < PI;
-  int isRayFacingUp = !isRayFacingDown;
-  int isRayFacingRight = rayAngle < (0.5 * PI) || rayAngle > (1.5 * PI);
-  int isRayFacingLeft = !isRayFacingRight;
+bool isRayFacingUp(float angle) {
+  return !isRayFacingDown(angle);
+}
+
+bool isRayFacingRight(float angle) {
+  return angle < (0.5 * PI) || angle > (1.5 * PI);;
+}
+
+bool isRayFacingLeft(float angle) {
+  return !isRayFacingRight(angle);
+}
+
+void castRay(float rayAngle, int stripId) {
+  normalizeAngle(&rayAngle);
 
   float xintercept, yintercept;
   float xstep, ystep;
@@ -36,18 +45,18 @@ void castRay(float rayAngle, int stripId) {
 
   // Find the y-coordinate of the closest horizontal grid intersection
   yintercept = floor(player.y / TILE_SIZE) * TILE_SIZE;
-  yintercept += isRayFacingDown ? TILE_SIZE : 0;
+  yintercept += isRayFacingDown(rayAngle) ? TILE_SIZE : 0;
 
   // Find the x-coordinate of the closest horizontal grid intersection
   xintercept = player.x + (yintercept - player.y) / tan(rayAngle);
 
   // Calculate the increment xstep and ystep
   ystep = TILE_SIZE;
-  ystep *= isRayFacingUp ? -1 : 1;
+  ystep *= isRayFacingUp(rayAngle) ? -1 : 1;
 
   xstep = TILE_SIZE / tan(rayAngle);
-  xstep *= (isRayFacingLeft && xstep > 0) ? -1 : 1;
-  xstep *= (isRayFacingRight && xstep < 0) ? -1 : 1;
+  xstep *= (isRayFacingLeft(rayAngle) && xstep > 0) ? -1 : 1;
+  xstep *= (isRayFacingRight(rayAngle) && xstep < 0) ? -1 : 1;
 
   float nextHorzTouchX = xintercept;
   float nextHorzTouchY = yintercept;
@@ -55,7 +64,7 @@ void castRay(float rayAngle, int stripId) {
   // Increment xstep and ystep until we find a wall
   while (isInsideMap(nextHorzTouchX, nextHorzTouchY)) {
     float xToCheck = nextHorzTouchX;
-    float yToCheck = nextHorzTouchY + (isRayFacingUp ? -1 : 0);
+    float yToCheck = nextHorzTouchY + (isRayFacingUp(rayAngle) ? -1 : 0);
 
     if (mapHasWallAt(xToCheck, yToCheck)) {
       horzWallHitX = nextHorzTouchX;
@@ -81,25 +90,25 @@ void castRay(float rayAngle, int stripId) {
 
   // Find the x-coordinate of the closest vertical grid intersenction
   xintercept = floor(player.x / TILE_SIZE) * TILE_SIZE;
-  xintercept += isRayFacingRight ? TILE_SIZE : 0;
+  xintercept += isRayFacingRight(rayAngle) ? TILE_SIZE : 0;
 
   // Find the y-coordinate of the closest vertical grid intersection
   yintercept = player.y + (xintercept - player.x) * tan(rayAngle);
 
   // Calculate the increment xstep and ystep
   xstep = TILE_SIZE;
-  xstep *= isRayFacingLeft ? -1 : 1;
+  xstep *= isRayFacingLeft(rayAngle) ? -1 : 1;
 
   ystep = TILE_SIZE * tan(rayAngle);
-  ystep *= (isRayFacingUp && ystep > 0) ? -1 : 1;
-  ystep *= (isRayFacingDown && ystep < 0) ? -1 : 1;
+  ystep *= (isRayFacingUp(rayAngle) && ystep > 0) ? -1 : 1;
+  ystep *= (isRayFacingDown(rayAngle) && ystep < 0) ? -1 : 1;
 
   float nextVertTouchX = xintercept;
   float nextVertTouchY = yintercept;
 
   // Increment xstep and ystep until we find a wall
   while (isInsideMap(nextVertTouchX, nextVertTouchY)) {
-    float xToCheck = nextVertTouchX + (isRayFacingLeft ? -1 : 0);
+    float xToCheck = nextVertTouchX + (isRayFacingLeft(rayAngle) ? -1 : 0);
     float yToCheck = nextVertTouchY;
 
     if (mapHasWallAt(xToCheck, yToCheck)) {
