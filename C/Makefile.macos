@@ -1,0 +1,14 @@
+CC=clang
+LIBS=-L/opt/homebrew/lib -lSDL2 -lm
+INCLUDE=-D_THREAD_SAFE -I/opt/homebrew/include -I/opt/homebrew/include/SDL2
+CFLAGS=-Wall -pedantic
+SRC=./src/upng.c ./src/textures.c ./src/main.c
+
+build:
+	$(CC) $(CFLAGS) -std=c99 $(SRC) $(LIBS) $(INCLUDE) -o raycast
+
+run:
+	./raycast
+
+clean:
+	rm ./raycast
