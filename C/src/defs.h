@@ -1,5 +1,5 @@
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef DEFS_H
+#define DEFS_H
 
 #include <math.h>
 
@@ -7,8 +7,6 @@
 #define TWO_PI 6.28318530
 
 #define TILE_SIZE 64
-#define MAP_NUM_ROWS 13
-#define MAP_NUM_COLS 20
 
 #define MINIMAP_SCALE_FACTOR 0.2
 
