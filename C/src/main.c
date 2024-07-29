@@ -61,9 +61,14 @@ bool InitializeWindow(void) {
     return false;
   }
 
+  /* SDL_DisplayMode display_mode; */
+  /* SDL_GetCurrentDisplayMode(0, &display_mode); */
+  /* int fullScreenWidth = display_mode.w; */
+  /* int fullScreenHeight = display_mode.h; */
+  
   window =
       SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                       WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_BORDERLESS
+                      WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_BORDERLESS
                        // 0
       );
 
@@ -97,7 +102,7 @@ void destroyWindow(void) {
 }
 
 bool mapHasWallAt(float x, float y) {
-  if (x < 0 || x > WINDOW_WIDTH || y < 0 || y > WINDOW_HEIGHT) {
+  if (x < 0 || x > MAP_NUM_COLS * TILE_SIZE || y < 0 || y > MAP_NUM_ROWS * TILE_SIZE) {
     return true;
   }
 
@@ -208,8 +213,8 @@ void castRay(float rayAngle, int stripId) {
   float nextHorzTouchY = yintercept;
 
   // Increment xstep and ystep until we find a wall
-  while (nextHorzTouchX >= 0 && nextHorzTouchX <= WINDOW_WIDTH &&
-         nextHorzTouchY >= 0 && nextHorzTouchY <= WINDOW_HEIGHT) {
+  while (nextHorzTouchX >= 0 && nextHorzTouchX <= MAP_NUM_COLS * TILE_SIZE &&
+         nextHorzTouchY >= 0 && nextHorzTouchY <= MAP_NUM_ROWS * TILE_SIZE) {
     float xToCheck = nextHorzTouchX;
     float yToCheck = nextHorzTouchY + (isRayFacingUp ? -1 : 0);
 
@@ -254,8 +259,8 @@ void castRay(float rayAngle, int stripId) {
   float nextVertTouchY = yintercept;
 
   // Increment xstep and ystep until we find a wall
-  while (nextVertTouchX >= 0 && nextVertTouchX <= WINDOW_WIDTH &&
-         nextVertTouchY >= 0 && nextVertTouchY <= WINDOW_HEIGHT) {
+  while (nextVertTouchX >= 0 && nextVertTouchX <= MAP_NUM_COLS * TILE_SIZE &&
+         nextVertTouchY >= 0 && nextVertTouchY <= MAP_NUM_ROWS * TILE_SIZE) {
     float xToCheck = nextVertTouchX + (isRayFacingLeft ? -1 : 0);
     float yToCheck = nextVertTouchY;
 
