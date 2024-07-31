@@ -1,5 +1,6 @@
 #include "sprite.h"
 #include "defs.h"
+#include "graphics.h"
 #include "ray.h"
 
 #define NUM_SPRITES 1
@@ -43,6 +44,21 @@ void renderSpriteProjection(void) {
   // draw the projected sprites
   for (int i = 0; i < numVisibleSprites; i++) {
     // draw the pixels of the sprite in the correct position on the screen
+    sprite_t sprite = visibleSprites[i];
+
+    // calc sprite projected hieght and width (sprites are squares)
+    float spriteHeight = (TILE_SIZE / sprite.distance) * DIST_PROJ_PLANE;
+    float spriteWidth = spriteHeight;
+
+    float spriteTopY = (WINDOW_HEIGHT / 2) - (spriteHeight / 2);
+    spriteTopY = (spriteTopY < 0) ? 0 : spriteTopY;
+    float spriteBottomY = (WINDOW_HEIGHT / 2) + (spriteHeight / 2);
+    spriteBottomY =
+        (spriteBottomY > WINDOW_HEIGHT) ? WINDOW_HEIGHT : spriteBottomY;
+
+    // define where we should draw the sprite in the X
+    float spriteLeftX;
+    float spriteRightX;
   }
 }
 
