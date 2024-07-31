@@ -23,7 +23,7 @@
 #define FPS 30
 #define FRAME_TIME_LENGTH (1000 / FPS)
 
-#define NUM_TEXTURES 9
+#define NUM_TEXTURES 14
 
 typedef uint32_t color_t;
 

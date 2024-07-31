@@ -1,20 +1,30 @@
 #include "wall.h"
 
+void changeColorIntensity(color_t *color, float factor) {
+  color_t a = (*color & 0xFF000000);
+  color_t r = (*color & 0x00FF0000) * factor;
+  color_t g = (*color & 0x0000FF00) * factor;
+  color_t b = (*color & 0x000000FF) * factor;
+
+  *color = a | (r & 0x00FF0000) | (g & 0x0000FF00) | (b & 0x000000FF);
+}
+
 void renderWallProjection(void) {
   for (int x = 0; x < NUM_RAYS; x++) {
+    // calc perp dist to avoid fish-eye distortion
     float perpDistance =
         rays[x].distance * cos(rays[x].rayAngle - player.rotationAngle);
-    float projectedWallHeight = (TILE_SIZE / perpDistance) * DIST_PROJ_PLANE;
+    // calc the projected wall height
+    float wallHeight = (TILE_SIZE / perpDistance) * DIST_PROJ_PLANE;
 
-    int wallStripHeight = (int)projectedWallHeight;
+    int wallTopY = (WINDOW_HEIGHT / 2) - (wallHeight / 2);
+    wallTopY = wallTopY < 0 ? 0 : wallTopY;
 
-    int wallTopPixel = (WINDOW_HEIGHT / 2) - (wallStripHeight / 2);
-    wallTopPixel = wallTopPixel < 0 ? 0 : wallTopPixel;
+    int wallBottomY = (WINDOW_HEIGHT / 2) + (wallHeight / 2);
+    wallBottomY = wallBottomY > WINDOW_HEIGHT ? WINDOW_HEIGHT : wallBottomY;
 
-    int wallBottomPixel = (WINDOW_HEIGHT / 2) + (wallStripHeight / 2);
-    wallBottomPixel = wallBottomPixel > WINDOW_HEIGHT ? WINDOW_HEIGHT : wallBottomPixel;
-
-    for (int y = 0; y < wallTopPixel; y++) {
+    // draw ceiling
+    for (int y = 0; y < wallTopY; y++) {
       drawPixel(x, y, 0xFF333333);
     }
 
@@ -29,20 +39,33 @@ void renderWallProjection(void) {
     // get the correct texture if number from the map content
     int texNum = rays[x].wallHitContent - 1;
 
-    int texture_width = wallTextures[texNum].width;
-    int texture_height = wallTextures[texNum].height;
-    
-    for (int y = wallTopPixel; y < wallBottomPixel; y++) {
-      // calculate textureOffsetY
-      int distanceFromTop = y + (wallStripHeight / 2) - (WINDOW_HEIGHT / 2);
-      int textureOffsetY =
-          distanceFromTop * ((float)texture_height / wallStripHeight);
+    int texture_width = upng_get_width(textures[texNum]);
+    int texture_height = upng_get_height(textures[texNum]);
 
-      uint32_t texelColor = wallTextures[texNum].texture_buffer[texture_width * textureOffsetY + textureOffsetX];
+    // draw wall
+    for (int y = wallTopY; y < wallBottomY; y++) {
+      // calculate textureOffsetY
+      int distanceFromTop = y + (wallHeight / 2) - (WINDOW_HEIGHT / 2);
+      int textureOffsetY =
+          distanceFromTop * ((float)texture_height / wallHeight);
+
+      /* color_t texelColor = */
+      /*     textures[texNum] */
+      /*         .texture_buffer[texture_width * textureOffsetY +
+       * textureOffsetX]; */
+
+      color_t* wallTextureBuffer = (color_t*) upng_get_buffer(textures[texNum]);
+      color_t texelColor = wallTextureBuffer[(texture_width * textureOffsetY) + textureOffsetX];
+
+      if (rays[x].wasHitVertical) {
+	changeColorIntensity(&texelColor, 0.7);
+      }
+      
       drawPixel(x, y, texelColor);
     }
 
-    for (int y = wallBottomPixel; y < WINDOW_HEIGHT; y++) {
+    // draw floor
+    for (int y = wallBottomY; y < WINDOW_HEIGHT; y++) {
       drawPixel(x, y, 0xFF777777);
     }
   }

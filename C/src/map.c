@@ -29,7 +29,7 @@ bool isInsideMap(float x, float y) {
   return (x >= 0 && x <= MAP_NUM_COLS * TILE_SIZE && y >= 0 && y <= MAP_NUM_ROWS * TILE_SIZE);
 }
 
-void renderMap(void) {
+void renderMapGrid(void) {
   for (int i = 0; i < MAP_NUM_ROWS; i++) {
     for (int j = 0; j < MAP_NUM_COLS; j++) {
       int tileX = j * TILE_SIZE;

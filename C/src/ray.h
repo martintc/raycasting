@@ -6,6 +6,7 @@
 
 #include "defs.h"
 #include "player.h"
+#include "utils.h"
 
 typedef struct {
   float rayAngle;
@@ -26,7 +27,7 @@ bool isRayFacingRight(float angle);
 bool isRayFacingLeft(float angle);
 void castRay(float rayAngle, int stripId);
 void castAllRays(void);
-void renderRays(void);
+void renderMapRays(void);
 
 
 #endif

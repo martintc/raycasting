@@ -5,19 +5,21 @@
 #include "defs.h"
 #include "upng.h"
 
-typedef struct {
-  upng_t* upngTexture;
-  int width;
-  int height;
-  uint32_t* texture_buffer;
-} texture_t;
+/* typedef struct { */
+/*   int width; */
+/*   int height; */
+/*   color_t *texture_buffer; */
+/*   upng_t* upngTexture; */
+/* } texture_t; */
 
 extern const char *textureFileNames[NUM_TEXTURES];
 
-extern texture_t wallTextures[NUM_TEXTURES];
+/* extern texture_t textures[NUM_TEXTURES]; */
 
-void loadWallTextures(void);
+extern upng_t* textures[NUM_TEXTURES];
 
-void freeWallTextures(void);
+void loadTextures(void);
+
+void freeTextures(void);
 
 #endif

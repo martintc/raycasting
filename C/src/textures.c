@@ -4,17 +4,17 @@
 #include <stdio.h>
 
 const char *textureFileNames[NUM_TEXTURES] = {
-    "./images/redbrick.png",   "./images/purplestone.png",
+    "./images/redbrick.png", "./images/purplestone.png",
     "./images/mossystone.png", "./images/graystone.png",
-    "./images/colorstone.png", "./images/bluestone.png",
-    "./images/wood.png",       "./images/eagle.png",
-    "./images/pikuma.png",
-
+    "./images/colorstone.png", "./images/bluestone.png", "./images/wood.png",
+    "./images/eagle.png", "./images/pikuma.png", "./images/barrel.png",
+    "./images/light.png", "./images/table.png", "./images/guard.png", "./images/armor.png"
 };
 
-texture_t wallTextures[NUM_TEXTURES];
+/* texture_t textures[NUM_TEXTURES]; */
+upng_t* textures[NUM_TEXTURES];
 
-void loadWallTextures(void) {
+void loadTextures(void) {
   for (int i = 0; i < NUM_TEXTURES; i++) {
     upng_t *upng;
 
@@ -22,18 +22,24 @@ void loadWallTextures(void) {
     if (upng != NULL) {
       upng_decode(upng);
       if (upng_get_error(upng) == UPNG_EOK) {
-	wallTextures[i].upngTexture = upng;
-        wallTextures[i].width = upng_get_width(upng);
-        wallTextures[i].height = upng_get_height(upng);
-        wallTextures[i].texture_buffer = (color_t *)upng_get_buffer(upng);
+	/* textures[i].upngTexture = upng; */
+        /* textures[i].width = upng_get_width(upng); */
+        /* textures[i].height = upng_get_height(upng); */
+        /* textures[i].texture_buffer = (color_t *)upng_get_buffer(upng); */
+	textures[i] = upng;
+      } else {
+        printf("Error decoding texture file %s\n", textureFileNames[i]);
       }
+    } else {
+      printf("Error loading texture %s\n", textureFileNames[i]);
     }
   }
 }
 
-void freeWallTextures(void) {
+void freeTextures(void) {
   for (int i = 0; i < NUM_TEXTURES; i++) {
-    upng_free(wallTextures[i].upngTexture);
+    /* upng_free(textures[i].upngTexture); */
+    upng_free(textures[i]);
   }
 }
 

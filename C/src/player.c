@@ -9,12 +9,13 @@ player_t player = {
     .walkDirection = 0,
     .rotationAngle = PI / 2,
     .walkSpeed = 100,
-    .turnSpeed = 45 * (PI / 180),
+    .turnSpeed = 60 * (PI / 180),
 };
 
 void movePlayer(float deltaTime) {
   player.rotationAngle += player.turnDirection * player.turnSpeed * deltaTime;
-
+  normalizeAngle(&player.rotationAngle);
+  
   float moveStep = player.walkDirection * player.walkSpeed * deltaTime;
 
   float newPlayerX = player.x + cos(player.rotationAngle) * moveStep;
@@ -26,7 +27,7 @@ void movePlayer(float deltaTime) {
   }
 }
 
-void renderPlayer(void) {
+void renderMapPlayer(void) {
   /* SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); */
   /* SDL_Rect playerRect = {player.x * MINIMAP_SCALE_FACTOR, */
   /*                        player.y * MINIMAP_SCALE_FACTOR, */
